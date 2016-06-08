@@ -84,6 +84,7 @@ public class TelegramEventHandler implements Listener {
                     break;
                 }
                 case "ignore": {
+                    event.getCallbackQuery().answer("Use Next or Previous to navigate.", true);
                     return;
                 }
                 default: {

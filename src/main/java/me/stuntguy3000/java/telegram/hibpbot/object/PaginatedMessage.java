@@ -1,5 +1,7 @@
 package me.stuntguy3000.java.telegram.hibpbot.object;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import lombok.Data;
@@ -22,10 +24,25 @@ public class PaginatedMessage {
     }
 
     public InlineKeyboardMarkup getButtons() {
-        InlineKeyboardButton left = InlineKeyboardButton.builder().callbackData(messageID.toString() + "|prev").text("«").build();
-        InlineKeyboardButton pageIndicator = InlineKeyboardButton.builder().callbackData(messageID.toString() + "|ignore")
-                .text("Page " + paginatedList.getCurrentPage() + "/" + paginatedList.getPages()).build();
-        InlineKeyboardButton right = InlineKeyboardButton.builder().callbackData(messageID.toString() + "|next").text("»").build();
-        return InlineKeyboardMarkup.builder().addRow(left, pageIndicator, right).build();
+        List<InlineKeyboardButton> buttons = new ArrayList<>();
+
+        if (paginatedList.getCurrentPage() > 1) {
+            buttons.add(InlineKeyboardButton.builder()
+                    .callbackData(messageID.toString() + "|prev")
+                    .text("Previous").build());
+        }
+
+        buttons.add(InlineKeyboardButton.builder()
+                .callbackData(messageID.toString() + "|ignore")
+                .text("Page " + paginatedList.getCurrentPage() + "/" + paginatedList.getPages())
+                .build());
+
+        if (paginatedList.getCurrentPage() < paginatedList.getPages()) {
+            buttons.add(InlineKeyboardButton.builder()
+                    .callbackData(messageID.toString() + "|next")
+                    .text("Next").build());
+        }
+
+        return InlineKeyboardMarkup.builder().addRow(buttons).build();
     }
 }
