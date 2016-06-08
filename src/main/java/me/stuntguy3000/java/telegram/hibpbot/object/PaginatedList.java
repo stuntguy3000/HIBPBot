@@ -38,6 +38,10 @@ public class PaginatedList {
         }
 
         if (stringAmount > 0) {
+            if (pageID == 0) {
+                pageID++;
+            }
+
             pages.put(pageID, new ArrayList<>(currentPage));
         }
     }
@@ -73,7 +77,11 @@ public class PaginatedList {
         return process(pages.get(currentPage));
     }
 
-    public String process(List<String> content) {
+    private String process(List<String> content) {
+        if (content == null) {
+            return null;
+        }
+
         StringBuilder stringBuilder = new StringBuilder();
 
         for (String line : content) {

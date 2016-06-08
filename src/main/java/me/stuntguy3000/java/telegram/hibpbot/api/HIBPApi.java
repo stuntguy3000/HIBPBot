@@ -60,7 +60,7 @@ public class HIBPApi {
      * @return Breaches a class containing all breaches
      */
     public static List<Breach> getBreachList(String domain) throws ApiException {
-        HttpResponse<JsonNode> jsonResponse = getJson("breaches" + (domain != null ? domain : ""));
+        HttpResponse<JsonNode> jsonResponse = getJson("breaches" + (domain != null ? "?domain=" + domain : ""));
 
         List<Breach> breaches = new ArrayList<>();
 

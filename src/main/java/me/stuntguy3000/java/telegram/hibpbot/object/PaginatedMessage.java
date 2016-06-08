@@ -24,6 +24,10 @@ public class PaginatedMessage {
     }
 
     public InlineKeyboardMarkup getButtons() {
+        if (paginatedList.getPages() == 1) {
+            return null;
+        }
+
         List<InlineKeyboardButton> buttons = new ArrayList<>();
 
         if (paginatedList.getCurrentPage() > 1) {

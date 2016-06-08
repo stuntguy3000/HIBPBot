@@ -1,8 +1,8 @@
 package me.stuntguy3000.java.telegram.hibpbot.command;
 
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import me.stuntguy3000.java.telegram.hibpbot.HIBPBot;
 import me.stuntguy3000.java.telegram.hibpbot.api.HIBPApi;
@@ -10,6 +10,7 @@ import me.stuntguy3000.java.telegram.hibpbot.api.exception.ApiException;
 import me.stuntguy3000.java.telegram.hibpbot.api.exception.NoBreachesException;
 import me.stuntguy3000.java.telegram.hibpbot.api.model.Breach;
 import me.stuntguy3000.java.telegram.hibpbot.object.PaginatedMessage;
+import me.stuntguy3000.java.telegram.hibpbot.object.Util;
 import me.stuntguy3000.java.telegram.hibpbot.object.command.Command;
 import pro.zackpollard.telegrambot.api.chat.Chat;
 import pro.zackpollard.telegrambot.api.chat.message.Message;
@@ -30,12 +31,19 @@ public class ListBreachesCommand extends Command {
         event.getChat().sendMessage("Fetching...");
 
         if (event.getArgs().length > 0) {
-            List<Breach> breaches = HIBPApi.getBreachList(event.getArgs()[0]);
+            String domain = event.getArgs()[0];
 
-            if (breaches == null) {
-                event.getChat().sendMessage("No site found.");
+            if (Util.isValidURL(domain)) {
+
+                List<Breach> breaches = HIBPApi.getBreachList(event.getArgs()[0]);
+
+                if (breaches == null) {
+                    event.getChat().sendMessage("No site found.");
+                } else {
+                    sendBreaches(event.getChat(), breaches);
+                }
             } else {
-                sendBreaches(event.getChat(), breaches);
+                event.getChat().sendMessage("Domain name contains invalid characters.");
             }
         } else {
             List<Breach> breachList = HIBPApi.getBreachList(null);
@@ -49,7 +57,16 @@ public class ListBreachesCommand extends Command {
     }
 
     private void sendBreaches(Chat chat, List<Breach> breaches) {
-        List<String> content = breaches.stream().map(Breach::getName).collect(Collectors.toList());
+        List<String> content = new ArrayList<>();
+
+        if (breaches == null || breaches.size() == 0) {
+            chat.sendMessage("No site found.");
+            return;
+        }
+
+        for (Breach breach : breaches) {
+            content.add(String.format("*%s*: `%s` - %d affected users", breach.getTitle(), breach.getDomain(), breach.getPwnCount()));
+        }
 
         PaginatedMessage paginatedMessage =
                 HIBPBot.getInstance().getPaginationHandler().createPaginatedMessage(content, 15);
