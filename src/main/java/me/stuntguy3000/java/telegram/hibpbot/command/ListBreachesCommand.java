@@ -1,10 +1,8 @@
 package me.stuntguy3000.java.telegram.hibpbot.command;
 
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.UUID;
+import java.util.stream.Collectors;
 
 import me.stuntguy3000.java.telegram.hibpbot.HIBPBot;
 import me.stuntguy3000.java.telegram.hibpbot.api.HIBPApi;
@@ -15,10 +13,9 @@ import me.stuntguy3000.java.telegram.hibpbot.object.PaginatedMessage;
 import me.stuntguy3000.java.telegram.hibpbot.object.command.Command;
 import pro.zackpollard.telegrambot.api.chat.Chat;
 import pro.zackpollard.telegrambot.api.chat.message.Message;
+import pro.zackpollard.telegrambot.api.chat.message.send.ParseMode;
 import pro.zackpollard.telegrambot.api.chat.message.send.SendableTextMessage;
 import pro.zackpollard.telegrambot.api.event.chat.message.CommandMessageReceivedEvent;
-import pro.zackpollard.telegrambot.api.keyboards.InlineKeyboardButton;
-import pro.zackpollard.telegrambot.api.keyboards.InlineKeyboardMarkup;
 
 /**
  * @author stuntguy3000
@@ -52,23 +49,19 @@ public class ListBreachesCommand extends Command {
     }
 
     private void sendBreaches(Chat chat, List<Breach> breaches) {
-        List<String> content = new ArrayList<>();
+        List<String> content = breaches.stream().map(Breach::getName).collect(Collectors.toList());
 
-        for (Breach breach : breaches) {
-            content.add(breach.getName());
-        }
+        PaginatedMessage paginatedMessage =
+                HIBPBot.getInstance().getPaginationHandler().createPaginatedMessage(content, 15);
 
-        UUID uuid = UUID.randomUUID();
+        Message message = chat.sendMessage(
+                SendableTextMessage.builder()
+                        .message(paginatedMessage.getPaginatedList().getCurrentPageContent())
+                        .replyMarkup(paginatedMessage.getButtons())
+                        .parseMode(ParseMode.MARKDOWN)
+                        .disableWebPagePreview(true)
+                        .build());
 
-        InlineKeyboardButton left = InlineKeyboardButton.builder().callbackData(uuid.toString() + "|prev").text("«").build();
-        InlineKeyboardButton right = InlineKeyboardButton.builder().callbackData(uuid.toString() + "|next").text("»").build();
-        InlineKeyboardMarkup pagination = InlineKeyboardMarkup.builder().addRow(left, right).build();
-        Message message = chat.sendMessage(SendableTextMessage.builder().message("This is paginated!").replyMarkup(pagination).build());
-
-        PaginatedMessage paginatedMessage = HIBPBot.getInstance().getPaginationHandler().createPaginatedMessage(
-                message, UUID.randomUUID(), content, 15, Arrays.asList(left, right)
-        );
-
-        System.out.println(paginatedMessage.getMessageID());
+        paginatedMessage.setMessage(message);
     }
 }

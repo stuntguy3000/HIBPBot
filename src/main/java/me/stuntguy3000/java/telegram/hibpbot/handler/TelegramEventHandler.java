@@ -24,9 +24,14 @@
 
 package me.stuntguy3000.java.telegram.hibpbot.handler;
 
+import java.util.UUID;
+
 import me.stuntguy3000.java.telegram.hibpbot.HIBPBot;
+import me.stuntguy3000.java.telegram.hibpbot.hook.TelegramHook;
+import me.stuntguy3000.java.telegram.hibpbot.object.PaginatedMessage;
+import pro.zackpollard.telegrambot.api.chat.message.send.ParseMode;
 import pro.zackpollard.telegrambot.api.event.Listener;
-import pro.zackpollard.telegrambot.api.event.chat.inline.InlineCallbackQueryReceivedEvent;
+import pro.zackpollard.telegrambot.api.event.chat.CallbackQueryReceivedEvent;
 import pro.zackpollard.telegrambot.api.event.chat.message.CommandMessageReceivedEvent;
 
 /**
@@ -47,8 +52,49 @@ public class TelegramEventHandler implements Listener {
     }
 
     @Override
-    public void onInlineCallbackQueryReceivedEvent(InlineCallbackQueryReceivedEvent event) {
+    public void onCallbackQueryReceivedEvent(CallbackQueryReceivedEvent event) {
         String ID = event.getCallbackQuery().getData();
         System.out.println("Callback: " + ID);
+
+        String action;
+        UUID uuid;
+        try {
+            uuid = UUID.fromString(ID.split("\\|")[0]);
+            action = ID.split("\\|")[1];
+        } catch (Exception ex) {
+            event.getCallbackQuery().answer("Unable to continue! Contact @stuntguy3000", true);
+            ex.printStackTrace();
+            return;
+        }
+
+        PaginatedMessage paginatedMessage = HIBPBot.getInstance().getPaginationHandler().getMessage(uuid);
+        String content;
+
+        if (paginatedMessage == null) {
+            event.getCallbackQuery().answer("Unable to continue! Contact @stuntguy3000", true);
+            return;
+        } else {
+            switch (action) {
+                case "next": {
+                    content = paginatedMessage.getPaginatedList().switchToNextPage();
+                    break;
+                }
+                case "prev": {
+                    content = paginatedMessage.getPaginatedList().switchToPreviousPage();
+                    break;
+                }
+                case "ignore": {
+                    return;
+                }
+                default: {
+                    event.getCallbackQuery().answer("Unable to continue! Contact @stuntguy3000", true);
+                    return;
+                }
+            }
+        }
+
+        TelegramHook.getBot().editMessageText(
+                paginatedMessage.getMessage(), content, ParseMode.MARKDOWN, false, paginatedMessage.getButtons()
+        );
     }
 }

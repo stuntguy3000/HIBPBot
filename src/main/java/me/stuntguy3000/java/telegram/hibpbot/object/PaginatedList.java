@@ -2,7 +2,6 @@ package me.stuntguy3000.java.telegram.hibpbot.object;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 
 import lombok.Data;
@@ -11,8 +10,8 @@ import lombok.Data;
  * @author stuntguy3000
  */
 @Data
-public class PaginatedList implements Iterator<List<String>> {
-    private int currentPage;
+public class PaginatedList {
+    private int currentPage = 1;
     private HashMap<Integer, List<String>> pages = new HashMap<>();
 
     /**
@@ -23,6 +22,7 @@ public class PaginatedList implements Iterator<List<String>> {
      */
     public PaginatedList(List<String> contentList, int perPage) {
         int stringAmount = 0;
+        int pageID = 0;
         List<String> currentPage = new ArrayList<>();
 
         for (String string : contentList) {
@@ -30,14 +30,15 @@ public class PaginatedList implements Iterator<List<String>> {
             currentPage.add(string);
 
             if (stringAmount == perPage) {
-                pages.put(stringAmount, new ArrayList<>(currentPage));
+                pageID++;
+                pages.put(pageID, new ArrayList<>(currentPage));
                 currentPage.clear();
                 stringAmount = 0;
             }
         }
 
         if (stringAmount > 0) {
-            pages.put(stringAmount, new ArrayList<>(currentPage));
+            pages.put(pageID, new ArrayList<>(currentPage));
         }
     }
 
@@ -50,23 +51,36 @@ public class PaginatedList implements Iterator<List<String>> {
         return pages.size();
     }
 
-    @Override
-    public boolean hasNext() {
-        return true;
-    }
-
-    @Override
-    public List<String> next() {
+    public String switchToNextPage() {
         currentPage++;
         if (pages.size() < currentPage) {
             currentPage = 1;
         }
 
-        return pages.get(currentPage);
+        return process(pages.get(currentPage));
     }
 
-    @Override
-    public void remove() {
+    public String switchToPreviousPage() {
+        currentPage--;
+        if (currentPage < 1) {
+            currentPage = pages.size();
+        }
 
+        return process(pages.get(currentPage));
+    }
+
+    public String getCurrentPageContent() {
+        return process(pages.get(currentPage));
+    }
+
+    public String process(List<String> content) {
+        StringBuilder stringBuilder = new StringBuilder();
+
+        for (String line : content) {
+            stringBuilder.append(line);
+            stringBuilder.append("\n");
+        }
+
+        return stringBuilder.toString();
     }
 }

@@ -7,8 +7,6 @@ import java.util.UUID;
 import lombok.Data;
 import me.stuntguy3000.java.telegram.hibpbot.object.PaginatedList;
 import me.stuntguy3000.java.telegram.hibpbot.object.PaginatedMessage;
-import pro.zackpollard.telegrambot.api.chat.message.Message;
-import pro.zackpollard.telegrambot.api.keyboards.InlineKeyboardButton;
 
 /**
  * @author stuntguy3000
@@ -17,11 +15,15 @@ import pro.zackpollard.telegrambot.api.keyboards.InlineKeyboardButton;
 public class PaginationHandler {
     private HashMap<UUID, PaginatedMessage> paginatedMessages = new HashMap<>();
 
-    public PaginatedMessage createPaginatedMessage(Message message, UUID uuid, List<String> content, int perPage, List<InlineKeyboardButton> buttons) {
+    public PaginatedMessage createPaginatedMessage(List<String> content, int perPage) {
         PaginatedList paginatedList = new PaginatedList(content, perPage);
 
-        PaginatedMessage paginatedMessage = new PaginatedMessage(paginatedList, message, uuid, buttons);
-        paginatedMessages.put(uuid, paginatedMessage);
+        PaginatedMessage paginatedMessage = new PaginatedMessage(paginatedList);
+        paginatedMessages.put(paginatedMessage.getMessageID(), paginatedMessage);
         return paginatedMessage;
+    }
+
+    public PaginatedMessage getMessage(UUID uuid) {
+        return paginatedMessages.get(uuid);
     }
 }
