@@ -64,4 +64,9 @@ public class PaginatedList implements Iterator<List<String>> {
 
         return pages.get(currentPage);
     }
+
+    @Override
+    public void remove() {
+
+    }
 }
