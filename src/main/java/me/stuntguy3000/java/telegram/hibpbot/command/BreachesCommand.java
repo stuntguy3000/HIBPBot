@@ -4,7 +4,6 @@ package me.stuntguy3000.java.telegram.hibpbot.command;
 import java.util.List;
 
 import me.stuntguy3000.java.telegram.hibpbot.HIBPBot;
-import me.stuntguy3000.java.telegram.hibpbot.api.HIBPApi;
 import me.stuntguy3000.java.telegram.hibpbot.api.exception.ApiException;
 import me.stuntguy3000.java.telegram.hibpbot.api.exception.NoBreachesException;
 import me.stuntguy3000.java.telegram.hibpbot.api.model.Breach;
@@ -29,7 +28,7 @@ public class BreachesCommand extends Command {
             String domain = event.getArgs()[0];
 
             if (Util.isValidURL(domain)) {
-                List<Breach> breaches = HIBPApi.getBreachList(event.getArgs()[0]);
+                List<Breach> breaches = HIBPBot.getInstance().getHibpApi().getBreachList(event.getArgs()[0]);
 
                 if (breaches == null) {
                     event.getChat().sendMessage("No site found.");
@@ -40,7 +39,7 @@ public class BreachesCommand extends Command {
                 event.getChat().sendMessage("Domain name contains invalid characters.");
             }
         } else {
-            List<Breach> breachList = HIBPApi.getBreachList(null);
+            List<Breach> breachList = HIBPBot.getInstance().getHibpApi().getBreachList(null);
 
             if (breachList == null) {
                 throw new NoBreachesException();

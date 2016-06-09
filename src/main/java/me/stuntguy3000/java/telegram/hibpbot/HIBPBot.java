@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 
 import lombok.Data;
+import me.stuntguy3000.java.telegram.hibpbot.api.HIBPApi;
 import me.stuntguy3000.java.telegram.hibpbot.handler.CommandHandler;
 import me.stuntguy3000.java.telegram.hibpbot.handler.ConfigHandler;
 import me.stuntguy3000.java.telegram.hibpbot.handler.LogHandler;
@@ -32,6 +33,7 @@ public class HIBPBot {
     private ConfigHandler configHandler;
     private CommandHandler commandHandler;
     private PaginationHandler paginationHandler;
+    private HIBPApi hibpApi;
 
     public static HIBPBot getInstance() {
         return instance;
@@ -51,6 +53,8 @@ public class HIBPBot {
         configHandler = new ConfigHandler();
         commandHandler = new CommandHandler();
         paginationHandler = new PaginationHandler();
+
+        hibpApi = new HIBPApi();
 
         File build = new File("build");
 

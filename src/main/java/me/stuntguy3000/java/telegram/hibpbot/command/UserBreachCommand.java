@@ -3,7 +3,6 @@ package me.stuntguy3000.java.telegram.hibpbot.command;
 import java.util.List;
 
 import me.stuntguy3000.java.telegram.hibpbot.HIBPBot;
-import me.stuntguy3000.java.telegram.hibpbot.api.HIBPApi;
 import me.stuntguy3000.java.telegram.hibpbot.api.exception.ApiException;
 import me.stuntguy3000.java.telegram.hibpbot.api.model.Breach;
 import me.stuntguy3000.java.telegram.hibpbot.handler.BreachHandler;
@@ -26,7 +25,7 @@ public class UserBreachCommand extends Command {
         if (event.getArgs().length > 0) {
             String userID = event.getArgs()[0];
 
-            List<Breach> breaches = HIBPApi.getUserBreaches(userID);
+            List<Breach> breaches = HIBPBot.getInstance().getHibpApi().getUserBreaches(userID);
 
             if (breaches == null) {
                 event.getChat().sendMessage("Good news! This email or username has not been leaked.");

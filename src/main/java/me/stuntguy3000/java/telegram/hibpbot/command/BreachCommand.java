@@ -3,7 +3,6 @@ package me.stuntguy3000.java.telegram.hibpbot.command;
 import java.util.List;
 
 import me.stuntguy3000.java.telegram.hibpbot.HIBPBot;
-import me.stuntguy3000.java.telegram.hibpbot.api.HIBPApi;
 import me.stuntguy3000.java.telegram.hibpbot.api.exception.ApiException;
 import me.stuntguy3000.java.telegram.hibpbot.api.model.Breach;
 import me.stuntguy3000.java.telegram.hibpbot.object.Util;
@@ -30,7 +29,7 @@ public class BreachCommand extends Command {
             String domain = event.getArgs()[0];
 
             if (Util.isValidURL(domain)) {
-                List<Breach> breaches = HIBPApi.getBreachList(event.getArgs()[0]);
+                List<Breach> breaches = HIBPBot.getInstance().getHibpApi().getBreachList(event.getArgs()[0]);
 
                 if (breaches == null) {
                     event.getChat().sendMessage("No site found.");
