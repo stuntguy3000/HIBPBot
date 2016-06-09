@@ -24,14 +24,24 @@
 
 package me.stuntguy3000.java.telegram.hibpbot.handler;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import me.stuntguy3000.java.telegram.hibpbot.HIBPBot;
+import me.stuntguy3000.java.telegram.hibpbot.api.exception.ApiException;
+import me.stuntguy3000.java.telegram.hibpbot.api.exception.NoUserException;
+import me.stuntguy3000.java.telegram.hibpbot.api.model.Breach;
 import me.stuntguy3000.java.telegram.hibpbot.hook.TelegramHook;
 import me.stuntguy3000.java.telegram.hibpbot.object.PaginatedMessage;
+import pro.zackpollard.telegrambot.api.chat.inline.send.InlineQueryResponse;
+import pro.zackpollard.telegrambot.api.chat.inline.send.content.InputTextMessageContent;
+import pro.zackpollard.telegrambot.api.chat.inline.send.results.InlineQueryResult;
+import pro.zackpollard.telegrambot.api.chat.inline.send.results.InlineQueryResultArticle;
 import pro.zackpollard.telegrambot.api.chat.message.send.ParseMode;
 import pro.zackpollard.telegrambot.api.event.Listener;
 import pro.zackpollard.telegrambot.api.event.chat.CallbackQueryReceivedEvent;
+import pro.zackpollard.telegrambot.api.event.chat.inline.InlineQueryReceivedEvent;
 import pro.zackpollard.telegrambot.api.event.chat.message.CommandMessageReceivedEvent;
 
 /**
@@ -97,5 +107,51 @@ public class TelegramEventHandler implements Listener {
         TelegramHook.getBot().editMessageText(
                 paginatedMessage.getMessage(), content, ParseMode.MARKDOWN, false, paginatedMessage.getButtons()
         );
+    }
+
+    @Override
+    public void onInlineQueryReceived(InlineQueryReceivedEvent event) {
+        List<InlineQueryResult> inlineQueryResults = new ArrayList<>();
+
+        try {
+            List<Breach> breaches = HIBPBot.getInstance().getHibpApi().getUserBreaches(event.getQuery().getQuery());
+
+            inlineQueryResults.add(InlineQueryResultArticle.builder()
+                    .description("haha ur being hacked")
+                    .title("Unknown error occurred.")
+                    .inputMessageContent(
+                            InputTextMessageContent.builder().messageText("KLOLGG").build()
+                    )
+                    .build()
+            );
+        } catch (NoUserException e) {
+            inlineQueryResults.add(InlineQueryResultArticle.builder()
+                    .description("You are in no breaches!")
+                    .title("Good News")
+                    .inputMessageContent(
+                            InputTextMessageContent.builder().messageText("GGNORE").build()
+                    )
+                    .build()
+            );
+        } catch (ApiException e) {
+            e.printStackTrace();
+
+            inlineQueryResults.add(InlineQueryResultArticle.builder()
+                    .description("Please try again later!")
+                    .title("Unknown error occurred.")
+                    .inputMessageContent(
+                            InputTextMessageContent.builder().messageText("wtf happened").build()
+                    )
+                    .build()
+            );
+        }
+
+        InlineQueryResponse inlineQueryResponse = InlineQueryResponse.builder()
+                .cache_time(0)
+                .is_personal(true)
+                .results(inlineQueryResults)
+                .build();
+
+        event.getQuery().answer(TelegramHook.getBot(), inlineQueryResponse);
     }
 }

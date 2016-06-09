@@ -12,6 +12,7 @@ public class ApiUnirestException extends ApiException {
     private UnirestException unirestException;
 
     public ApiUnirestException(UnirestException unirestException) {
+        super("An exception occurred during the Unirest operations.");
         this.unirestException = unirestException;
     }
 }

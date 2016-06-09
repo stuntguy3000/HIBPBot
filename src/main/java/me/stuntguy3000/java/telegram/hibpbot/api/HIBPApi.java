@@ -3,10 +3,14 @@ package me.stuntguy3000.java.telegram.hibpbot.api;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mashape.unirest.http.HttpResponse;
-import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
+import com.mashape.unirest.request.GetRequest;
 
 import org.apache.http.client.HttpClient;
 import org.apache.http.conn.ClientConnectionManager;
@@ -16,6 +20,7 @@ import org.apache.http.conn.scheme.SchemeRegistry;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.conn.SingleClientConnManager;
 
+import java.io.IOException;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -27,6 +32,7 @@ import java.util.List;
 import me.stuntguy3000.java.telegram.hibpbot.api.exception.ApiException;
 import me.stuntguy3000.java.telegram.hibpbot.api.exception.ApiUnirestException;
 import me.stuntguy3000.java.telegram.hibpbot.api.exception.InvalidAPIRequestException;
+import me.stuntguy3000.java.telegram.hibpbot.api.exception.NoUserException;
 import me.stuntguy3000.java.telegram.hibpbot.api.model.Breach;
 
 /**
@@ -85,11 +91,11 @@ public class HIBPApi {
             }
         }
 
-        HttpResponse<JsonNode> jsonResponse = getJson("breaches" + (domain != null ? "?domain=" + domain : ""));
+        JsonNode jsonResponse = getJson("breaches" + (domain != null ? "?domain=" + domain : ""));
 
         List<Breach> breaches = new ArrayList<>();
 
-        for (Object jsonArray : jsonResponse.getBody().getArray()) {
+        for (JsonNode jsonArray : jsonResponse) {
             String jsonArrayString = jsonArray.toString();
             breaches.add(gson.fromJson(jsonArrayString, Breach.class));
         }
@@ -112,11 +118,11 @@ public class HIBPApi {
             return hibpCache.getUserCache(userID);
         }
 
-        HttpResponse<JsonNode> jsonResponse = getJson("breachedaccount/" + userID);
+        JsonNode jsonResponse = getJson("breachedaccount/" + userID);
 
         List<Breach> breaches = new ArrayList<>();
 
-        for (Object jsonArray : jsonResponse.getBody().getArray()) {
+        for (JsonNode jsonArray : jsonResponse) {
             String jsonArrayString = jsonArray.toString();
             breaches.add(gson.fromJson(jsonArrayString, Breach.class));
         }
@@ -133,7 +139,7 @@ public class HIBPApi {
      *
      * @return HttpResponse the response from Unirest
      */
-    private HttpResponse<JsonNode> getJson(String params) throws ApiException {
+    private JsonNode getJson(String params) throws ApiException {
         if (params == null || params.isEmpty()) {
             throw new InvalidAPIRequestException();
         }
@@ -141,7 +147,31 @@ public class HIBPApi {
         Unirest.setHttpClient(makeClient());
 
         try {
-            return Unirest.get(baseUrl + params).headers(headers).asJson();
+            GetRequest getRequest = Unirest.get(baseUrl + params).headers(headers);
+
+            HttpResponse<String> response = getRequest.asString();
+
+            switch (response.getStatus()) {
+                case 403:
+                case 400: {
+                    throw new InvalidAPIRequestException();
+                }
+                case 404: {
+                    throw new NoUserException();
+                }
+                default: {
+                    ObjectMapper mapper = new ObjectMapper();
+                    JsonFactory factory = mapper.getFactory();
+
+                    try {
+                        JsonParser jsonParser = factory.createParser(response.getBody());
+                        return mapper.readTree(jsonParser);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        throw new InvalidAPIRequestException();
+                    }
+                }
+            }
         } catch (UnirestException e) {
             throw new ApiUnirestException(e);
         }

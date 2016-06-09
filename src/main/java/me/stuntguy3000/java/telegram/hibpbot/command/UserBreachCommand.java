@@ -4,6 +4,8 @@ import java.util.List;
 
 import me.stuntguy3000.java.telegram.hibpbot.HIBPBot;
 import me.stuntguy3000.java.telegram.hibpbot.api.exception.ApiException;
+import me.stuntguy3000.java.telegram.hibpbot.api.exception.NoBreachesException;
+import me.stuntguy3000.java.telegram.hibpbot.api.exception.NoUserException;
 import me.stuntguy3000.java.telegram.hibpbot.api.model.Breach;
 import me.stuntguy3000.java.telegram.hibpbot.handler.BreachHandler;
 import me.stuntguy3000.java.telegram.hibpbot.object.command.Command;
@@ -25,12 +27,11 @@ public class UserBreachCommand extends Command {
         if (event.getArgs().length > 0) {
             String userID = event.getArgs()[0];
 
-            List<Breach> breaches = HIBPBot.getInstance().getHibpApi().getUserBreaches(userID);
-
-            if (breaches == null) {
-                event.getChat().sendMessage("Good news! This email or username has not been leaked.");
-            } else {
+            try {
+                List<Breach> breaches = HIBPBot.getInstance().getHibpApi().getUserBreaches(userID);
                 BreachHandler.sendBreaches(event.getChat(), breaches, userID);
+            } catch (NoBreachesException | NoUserException ex) {
+                event.getChat().sendMessage("This user was not found in any breaches.");
             }
         } else {
             event.getChat().sendMessage("Please specify an email address.");

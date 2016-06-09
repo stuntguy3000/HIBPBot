@@ -5,4 +5,7 @@ package me.stuntguy3000.java.telegram.hibpbot.api.exception;
  */
 public class InvalidAPIRequestException extends ApiException {
 
+    public InvalidAPIRequestException() {
+        super("An invalid API request was performed.");
+    }
 }

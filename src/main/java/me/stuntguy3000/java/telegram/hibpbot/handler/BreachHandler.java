@@ -21,7 +21,7 @@ public class BreachHandler {
         List<String> content = new ArrayList<>();
 
         if (breaches == null || breaches.size() == 0) {
-            chat.sendMessage("No site found.");
+            chat.sendMessage("No sites found for user " + userID + ".");
             return;
         }
 
@@ -30,8 +30,17 @@ public class BreachHandler {
         } else {
             content.add("*Breached sites for user " + userID + ":*");
         }
+
         for (Breach breach : breaches) {
+            if (breach.getDomain() == null) {
+                continue;
+            }
             content.add(String.format("*%s*: `%s` - %d affected users", breach.getTitle(), breach.getDomain(), breach.getPwnCount()));
+        }
+
+        if (content.size() == 1) {
+            chat.sendMessage("No sites found for user " + userID + ".");
+            return;
         }
 
         PaginatedMessage paginatedMessage =
