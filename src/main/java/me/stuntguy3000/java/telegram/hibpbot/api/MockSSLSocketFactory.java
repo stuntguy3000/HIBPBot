@@ -19,8 +19,7 @@ import javax.net.ssl.SSLSocket;
 /**
  * @author <a href="mailto:alexoree@apache.org">Alex O'Ree</a>
  */
-public class MockSSLSocketFactory extends SSLSocketFactory {
-
+class MockSSLSocketFactory extends SSLSocketFactory {
     private static final X509HostnameVerifier hostnameVerifier = new X509HostnameVerifier() {
         //@Override
         public void verify(String host, SSLSocket ssl) throws IOException {
@@ -48,7 +47,8 @@ public class MockSSLSocketFactory extends SSLSocketFactory {
             return true;
         }
     };
-    public MockSSLSocketFactory() throws NoSuchAlgorithmException, KeyManagementException, KeyStoreException, UnrecoverableKeyException {
+
+    MockSSLSocketFactory() throws NoSuchAlgorithmException, KeyManagementException, KeyStoreException, UnrecoverableKeyException {
         super(trustStrategy, hostnameVerifier);
     }
 }

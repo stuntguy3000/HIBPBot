@@ -34,6 +34,7 @@ import me.stuntguy3000.java.telegram.hibpbot.api.exception.ApiUnirestException;
 import me.stuntguy3000.java.telegram.hibpbot.api.exception.InvalidAPIRequestException;
 import me.stuntguy3000.java.telegram.hibpbot.api.exception.NoUserException;
 import me.stuntguy3000.java.telegram.hibpbot.api.model.Breach;
+import me.stuntguy3000.java.telegram.hibpbot.object.Util;
 
 /**
  * Represents the class used to connect with the HIBP Api
@@ -89,6 +90,10 @@ public class HIBPApi {
             if (hibpCache.getDomainBreaches(domain) != null) {
                 return hibpCache.getDomainBreaches(domain);
             }
+
+            if (!Util.isValidURL(domain)) {
+                return null;
+            }
         }
 
         JsonNode jsonResponse = getJson("breaches" + (domain != null ? "?domain=" + domain : ""));
@@ -118,18 +123,22 @@ public class HIBPApi {
             return hibpCache.getUserCache(userID);
         }
 
-        JsonNode jsonResponse = getJson("breachedaccount/" + userID);
+        if (Util.isValidUsername(userID)) {
+            JsonNode jsonResponse = getJson("breachedaccount/" + userID);
 
-        List<Breach> breaches = new ArrayList<>();
+            List<Breach> breaches = new ArrayList<>();
 
-        for (JsonNode jsonArray : jsonResponse) {
-            String jsonArrayString = jsonArray.toString();
-            breaches.add(gson.fromJson(jsonArrayString, Breach.class));
+            for (JsonNode jsonArray : jsonResponse) {
+                String jsonArrayString = jsonArray.toString();
+                breaches.add(gson.fromJson(jsonArrayString, Breach.class));
+            }
+
+            hibpCache.addUser(userID, breaches);
+
+            return breaches;
+        } else {
+            throw new InvalidAPIRequestException();
         }
-
-        hibpCache.addUser(userID, breaches);
-
-        return breaches;
     }
 
     /**

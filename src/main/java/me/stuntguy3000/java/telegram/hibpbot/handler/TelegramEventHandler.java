@@ -64,10 +64,9 @@ public class TelegramEventHandler implements Listener {
     @Override
     public void onCallbackQueryReceivedEvent(CallbackQueryReceivedEvent event) {
         String ID = event.getCallbackQuery().getData();
-        System.out.println("Callback: " + ID);
-
         String action;
         UUID uuid;
+
         try {
             uuid = UUID.fromString(ID.split("\\|")[0]);
             action = ID.split("\\|")[1];
@@ -146,12 +145,7 @@ public class TelegramEventHandler implements Listener {
             );
         }
 
-        InlineQueryResponse inlineQueryResponse = InlineQueryResponse.builder()
-                .cache_time(0)
-                .is_personal(true)
-                .results(inlineQueryResults)
-                .build();
-
+        InlineQueryResponse inlineQueryResponse = InlineQueryResponse.builder().cache_time(0).is_personal(true).results(inlineQueryResults).build();
         event.getQuery().answer(TelegramHook.getBot(), inlineQueryResponse);
     }
 }

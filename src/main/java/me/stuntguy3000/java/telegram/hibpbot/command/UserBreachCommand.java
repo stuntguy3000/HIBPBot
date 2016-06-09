@@ -8,6 +8,7 @@ import me.stuntguy3000.java.telegram.hibpbot.api.exception.NoBreachesException;
 import me.stuntguy3000.java.telegram.hibpbot.api.exception.NoUserException;
 import me.stuntguy3000.java.telegram.hibpbot.api.model.Breach;
 import me.stuntguy3000.java.telegram.hibpbot.handler.BreachHandler;
+import me.stuntguy3000.java.telegram.hibpbot.object.Util;
 import me.stuntguy3000.java.telegram.hibpbot.object.command.Command;
 import pro.zackpollard.telegrambot.api.event.chat.message.CommandMessageReceivedEvent;
 
@@ -27,11 +28,16 @@ public class UserBreachCommand extends Command {
         if (event.getArgs().length > 0) {
             String userID = event.getArgs()[0];
 
-            try {
-                List<Breach> breaches = HIBPBot.getInstance().getHibpApi().getUserBreaches(userID);
-                BreachHandler.sendBreaches(event.getChat(), breaches, userID);
-            } catch (NoBreachesException | NoUserException ex) {
-                event.getChat().sendMessage("This user was not found in any breaches.");
+            if (Util.isValidUsername(userID)) {
+                try {
+                    List<Breach> breaches = HIBPBot.getInstance().getHibpApi().getUserBreaches(userID);
+                    BreachHandler.sendBreaches(event.getChat(), breaches, userID);
+                } catch (NoBreachesException | NoUserException ex) {
+                    event.getChat().sendMessage("This user was not found in any breaches.");
+                }
+            } else {
+                event.getChat().sendMessage("The username is invalid.\n" +
+                        "If this is a mistake, contact @stuntguy3000");
             }
         } else {
             event.getChat().sendMessage("Please specify an email address.");

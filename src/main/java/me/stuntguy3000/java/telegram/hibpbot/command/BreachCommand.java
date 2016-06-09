@@ -36,7 +36,8 @@ public class BreachCommand extends Command {
                     event.getChat().sendMessage("No breach could be found.");
                 }
             } else {
-                event.getChat().sendMessage("Domain name contains invalid characters.");
+                event.getChat().sendMessage("Domain name is invalid.\n" +
+                        "If this is a mistake, contact @stuntguy3000");
             }
         } else {
             event.getChat().sendMessage("Please specify a domain.");

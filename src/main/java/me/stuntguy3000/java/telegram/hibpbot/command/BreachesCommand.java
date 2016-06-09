@@ -36,7 +36,8 @@ public class BreachesCommand extends Command {
                     event.getChat().sendMessage("No breaches could be found.");
                 }
             } else {
-                event.getChat().sendMessage("Domain name contains invalid characters.");
+                event.getChat().sendMessage("Domain name is invalid.\n" +
+                        "If this is a mistake, contact @stuntguy3000");
             }
         } else {
             List<Breach> breachList = HIBPBot.getInstance().getHibpApi().getBreachList(null);
