@@ -133,8 +133,7 @@ public class TelegramEventHandler implements Listener {
             inlineQueryResults.add(InlineQueryResultArticle.builder()
                     .description("haha ur being hacked")
                     .title("Unknown error occurred.")
-                    .url(IMAGE_RED_URL)
-                    .hideUrl(true)
+                    .thumbUrl(IMAGE_RED_URL)
                     .inputMessageContent(
                             InputTextMessageContent.builder().messageText("KLOLGG").build()
                     )
@@ -144,8 +143,7 @@ public class TelegramEventHandler implements Listener {
             inlineQueryResults.add(InlineQueryResultArticle.builder()
                     .description("You are in no breaches!")
                     .title("Good News")
-                    .url(IMAGE_GREEN_URL)
-                    .hideUrl(true)
+                    .thumbUrl(IMAGE_GREEN_URL)
                     .inputMessageContent(
                             InputTextMessageContent.builder().messageText("GGNORE").build()
                     )
@@ -157,8 +155,7 @@ public class TelegramEventHandler implements Listener {
             inlineQueryResults.add(InlineQueryResultArticle.builder()
                     .description("Please try again later!")
                     .title("Unknown error occurred.")
-                    .url(IMAGE_BLUE_URL)
-                    .hideUrl(true)
+                    .thumbUrl(IMAGE_BLUE_URL)
                     .inputMessageContent(
                             InputTextMessageContent.builder().messageText("An unknown error occurred. Please contact @stuntguy3000").build()
                     )
