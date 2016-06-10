@@ -32,6 +32,7 @@ import java.util.UUID;
 
 import me.stuntguy3000.java.telegram.hibpbot.HIBPBot;
 import me.stuntguy3000.java.telegram.hibpbot.api.exception.ApiException;
+import me.stuntguy3000.java.telegram.hibpbot.api.exception.InvalidAPIRequestException;
 import me.stuntguy3000.java.telegram.hibpbot.api.exception.NoUserException;
 import me.stuntguy3000.java.telegram.hibpbot.api.model.Breach;
 import me.stuntguy3000.java.telegram.hibpbot.hook.TelegramHook;
@@ -125,27 +126,40 @@ public class TelegramEventHandler implements Listener {
 
     @Override
     public void onInlineQueryReceived(InlineQueryReceivedEvent event) {
+        String input = event.getQuery().getQuery();
         List<InlineQueryResult> inlineQueryResults = new ArrayList<>();
 
         try {
-            List<Breach> breaches = HIBPBot.getInstance().getHibpApi().getUserBreaches(event.getQuery().getQuery());
+            List<Breach> breaches = HIBPBot.getInstance().getHibpApi().getUserBreaches(input);
 
             inlineQueryResults.add(InlineQueryResultArticle.builder()
-                    .description("haha ur being hacked")
-                    .title("Unknown error occurred.")
+                    .description(input + " was found in " + breaches.size() + " breach(s). Click here to learn more.")
+                    .title(breaches.size() + " breach(s) found.")
                     .thumbUrl(IMAGE_RED_URL)
                     .inputMessageContent(
-                            InputTextMessageContent.builder().messageText("KLOLGG").build()
+                            InputTextMessageContent.builder().messageText(breaches.toString()).build()
                     )
                     .build()
             );
         } catch (NoUserException e) {
             inlineQueryResults.add(InlineQueryResultArticle.builder()
-                    .description("You are in no breaches!")
-                    .title("Good News")
+                    .description(input + " has not been leaked.")
+                    .title("No breaches found.")
                     .thumbUrl(IMAGE_GREEN_URL)
                     .inputMessageContent(
-                            InputTextMessageContent.builder().messageText("GGNORE").build()
+                            InputTextMessageContent.builder().parseMode(ParseMode.MARKDOWN).messageText("Congratulations, the domain or username *" + event.getQuery().getQuery() + "* has not been leaked (by any known database hacks to HIBP).").build()
+                    )
+                    .build()
+            );
+        } catch (InvalidAPIRequestException e) {
+            inlineQueryResults.add(InlineQueryResultArticle.builder()
+                    .description("You have specified an invalid username or domain.\n\nIf this is an error (such as the domain/username is valid) please contact @stuntguy3000")
+                    .title("Invalid Username/Domain")
+                    .thumbUrl(IMAGE_BLUE_URL)
+                    .inputMessageContent(
+                            InputTextMessageContent.builder().messageText("You have specified an invalid username or domain.\n" +
+                                    "\n" +
+                                    "If this is an error (such as the domain/username is valid) please contact @stuntguy3000").build()
                     )
                     .build()
             );
