@@ -24,6 +24,8 @@
 
 package me.stuntguy3000.java.telegram.hibpbot.handler;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -51,6 +53,19 @@ import pro.zackpollard.telegrambot.api.event.chat.message.CommandMessageReceived
  */
 public class TelegramEventHandler implements Listener {
 
+    private URL IMAGE_RED_URL;
+    private URL IMAGE_GREEN_URL;
+    private URL IMAGE_BLUE_URL;
+
+    public TelegramEventHandler() {
+        try {
+            IMAGE_GREEN_URL = new URL("https://i.imgur.com/tSqwfQf.png");
+            IMAGE_RED_URL = new URL("https://i.imgur.com/gt6uuYo.png");
+            IMAGE_BLUE_URL = new URL("https://i.imgur.com/IOkP5OT.png");
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+    }
     /**
      * Represents when a Command Message is received
      *
@@ -118,6 +133,8 @@ public class TelegramEventHandler implements Listener {
             inlineQueryResults.add(InlineQueryResultArticle.builder()
                     .description("haha ur being hacked")
                     .title("Unknown error occurred.")
+                    .url(IMAGE_RED_URL)
+                    .hideUrl(true)
                     .inputMessageContent(
                             InputTextMessageContent.builder().messageText("KLOLGG").build()
                     )
@@ -127,6 +144,8 @@ public class TelegramEventHandler implements Listener {
             inlineQueryResults.add(InlineQueryResultArticle.builder()
                     .description("You are in no breaches!")
                     .title("Good News")
+                    .url(IMAGE_GREEN_URL)
+                    .hideUrl(true)
                     .inputMessageContent(
                             InputTextMessageContent.builder().messageText("GGNORE").build()
                     )
@@ -138,8 +157,10 @@ public class TelegramEventHandler implements Listener {
             inlineQueryResults.add(InlineQueryResultArticle.builder()
                     .description("Please try again later!")
                     .title("Unknown error occurred.")
+                    .url(IMAGE_BLUE_URL)
+                    .hideUrl(true)
                     .inputMessageContent(
-                            InputTextMessageContent.builder().messageText("wtf happened").build()
+                            InputTextMessageContent.builder().messageText("An unknown error occurred. Please contact @stuntguy3000").build()
                     )
                     .build()
             );
