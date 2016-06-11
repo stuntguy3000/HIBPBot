@@ -30,4 +30,12 @@ public class Util {
     public static boolean isValidUsername(String input) {
         return USER_REGEX.matcher(input).find();
     }
+
+    public static String plural(String text, int size) {
+        if (size != 0) {
+            return text;
+        } else {
+            return "";
+        }
+    }
 }

@@ -37,6 +37,8 @@ import me.stuntguy3000.java.telegram.hibpbot.api.exception.NoUserException;
 import me.stuntguy3000.java.telegram.hibpbot.api.model.Breach;
 import me.stuntguy3000.java.telegram.hibpbot.hook.TelegramHook;
 import me.stuntguy3000.java.telegram.hibpbot.object.PaginatedMessage;
+import me.stuntguy3000.java.telegram.hibpbot.object.Util;
+import pro.zackpollard.telegrambot.api.chat.inline.ChosenInlineResult;
 import pro.zackpollard.telegrambot.api.chat.inline.send.InlineQueryResponse;
 import pro.zackpollard.telegrambot.api.chat.inline.send.content.InputTextMessageContent;
 import pro.zackpollard.telegrambot.api.chat.inline.send.results.InlineQueryResult;
@@ -45,6 +47,7 @@ import pro.zackpollard.telegrambot.api.chat.message.send.ParseMode;
 import pro.zackpollard.telegrambot.api.event.Listener;
 import pro.zackpollard.telegrambot.api.event.chat.CallbackQueryReceivedEvent;
 import pro.zackpollard.telegrambot.api.event.chat.inline.InlineQueryReceivedEvent;
+import pro.zackpollard.telegrambot.api.event.chat.inline.InlineResultChosenEvent;
 import pro.zackpollard.telegrambot.api.event.chat.message.CommandMessageReceivedEvent;
 
 /**
@@ -125,20 +128,53 @@ public class TelegramEventHandler implements Listener {
     }
 
     @Override
+    public void onInlineResultChosen(InlineResultChosenEvent event) {
+        ChosenInlineResult chosenInlineResult = event.getChosenResult();
+        String id = chosenInlineResult.getInlineMessageId();
+
+        if (id.contains("|")) {
+            String userID = id.split("\\|")[0];
+            List<Breach> breaches = null;
+            try {
+                breaches = HIBPBot.getInstance().getHibpApi().getUserBreaches(userID);
+
+                if (!(breaches == null || breaches.isEmpty() || breaches.size() == 0)) {
+                    //
+                }
+            } catch (ApiException e) {
+                e.printStackTrace();
+            }
+        }
+
+        TelegramHook.getBot().editInlineMessageReplyMarkup(
+                id, InlineQueryResultArticle.builder()
+                        .inputMessageContent(
+                                InputTextMessageContent.builder().messageText("Wot kk").build()
+                        )
+                        .build().getReplyMarkup()
+        );
+    }
+
+    @Override
     public void onInlineQueryReceived(InlineQueryReceivedEvent event) {
         String input = event.getQuery().getQuery();
         List<InlineQueryResult> inlineQueryResults = new ArrayList<>();
 
         try {
+            if (input.contains(" ")) {
+                throw new InvalidAPIRequestException();
+            }
+
             List<Breach> breaches = HIBPBot.getInstance().getHibpApi().getUserBreaches(input);
 
             inlineQueryResults.add(InlineQueryResultArticle.builder()
-                    .description(input + " was found in " + breaches.size() + " breach(s). Click here to learn more.")
-                    .title(breaches.size() + " breach(s) found.")
+                    .description(input + " was found in " + breaches.size() + " breach" + Util.plural("es", breaches.size()) + ". Click here to learn more.")
+                    .title(breaches.size() + " breach" + Util.plural("es", breaches.size()) + " found.")
                     .thumbUrl(IMAGE_RED_URL)
                     .inputMessageContent(
-                            InputTextMessageContent.builder().messageText(breaches.toString()).build()
+                            InputTextMessageContent.builder().messageText("Loading...").build()
                     )
+                    .id(input + "|" + UUID.randomUUID())
                     .build()
             );
         } catch (NoUserException e) {
@@ -147,19 +183,20 @@ public class TelegramEventHandler implements Listener {
                     .title("No breaches found.")
                     .thumbUrl(IMAGE_GREEN_URL)
                     .inputMessageContent(
-                            InputTextMessageContent.builder().parseMode(ParseMode.MARKDOWN).messageText("Congratulations, the domain or username *" + event.getQuery().getQuery() + "* has not been leaked (by any known database hacks to HIBP).").build()
+                            InputTextMessageContent.builder().parseMode(ParseMode.MARKDOWN).messageText("Congratulations, the email address or username *" + event.getQuery().getQuery() + "* has not been leaked (in any known databases to HIBP).").build()
                     )
                     .build()
             );
         } catch (InvalidAPIRequestException e) {
             inlineQueryResults.add(InlineQueryResultArticle.builder()
-                    .description("You have specified an invalid username or domain.\n\nIf this is an error (such as the domain/username is valid) please contact @stuntguy3000")
+                    .description("You have specified an invalid username or email address.\n" +
+                            "\nIf this is an error (such as the email/username is valid) please contact @stuntguy3000")
                     .title("Invalid Username/Domain")
                     .thumbUrl(IMAGE_BLUE_URL)
                     .inputMessageContent(
                             InputTextMessageContent.builder().messageText("You have specified an invalid username or domain.\n" +
                                     "\n" +
-                                    "If this is an error (such as the domain/username is valid) please contact @stuntguy3000").build()
+                                    "If this is an error (such as the email/username is valid) please contact @stuntguy3000").build()
                     )
                     .build()
             );
@@ -171,7 +208,10 @@ public class TelegramEventHandler implements Listener {
                     .title("Unknown error occurred.")
                     .thumbUrl(IMAGE_BLUE_URL)
                     .inputMessageContent(
-                            InputTextMessageContent.builder().messageText("An unknown error occurred. Please contact @stuntguy3000").build()
+                            InputTextMessageContent
+                                    .builder()
+                                    .messageText("An unknown error occurred. Please contact @stuntguy3000")
+                                    .build()
                     )
                     .build()
             );
