@@ -7,30 +7,21 @@ import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mashape.unirest.http.HttpResponse;
-import com.mashape.unirest.http.Unirest;
-import com.mashape.unirest.http.exceptions.UnirestException;
-import com.mashape.unirest.request.GetRequest;
-
-import org.apache.http.client.HttpClient;
-import org.apache.http.conn.ClientConnectionManager;
-import org.apache.http.conn.scheme.PlainSocketFactory;
-import org.apache.http.conn.scheme.Scheme;
-import org.apache.http.conn.scheme.SchemeRegistry;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.impl.conn.SingleClientConnManager;
 
 import java.io.IOException;
-import java.security.KeyManagementException;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.UnrecoverableKeyException;
+import java.io.InputStreamReader;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 
 import me.stuntguy3000.java.telegram.hibpbot.api.exception.ApiException;
-import me.stuntguy3000.java.telegram.hibpbot.api.exception.ApiUnirestException;
 import me.stuntguy3000.java.telegram.hibpbot.api.exception.InvalidAPIRequestException;
 import me.stuntguy3000.java.telegram.hibpbot.api.exception.NoUserException;
 import me.stuntguy3000.java.telegram.hibpbot.api.model.Breach;
@@ -59,18 +50,31 @@ public class HIBPApi {
         headers.put("user-agent", "HIBPBot-Telegram-by-@stuntguy3000");
 
         hibpCache = new HIBPCache();
-    }
 
-    public static HttpClient makeClient() {
-        SchemeRegistry schemeRegistry = new SchemeRegistry();
-        schemeRegistry.register(new Scheme("http", 80, PlainSocketFactory.getSocketFactory()));
+        // Create a trust manager that does not validate certificate chains
+        TrustManager[] trustAllCerts = new TrustManager[]{
+                new X509TrustManager() {
+                    public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+                        return null;
+                    }
+
+                    public void checkClientTrusted(
+                            java.security.cert.X509Certificate[] certs, String authType) {
+                    }
+
+                    public void checkServerTrusted(
+                            java.security.cert.X509Certificate[] certs, String authType) {
+                    }
+                }
+        };
+
+        // Install the all-trusting trust manager
         try {
-            schemeRegistry.register(new Scheme("https", 443, new MockSSLSocketFactory()));
-        } catch (KeyManagementException | NoSuchAlgorithmException | UnrecoverableKeyException | KeyStoreException e) {
-            e.printStackTrace();
+            SSLContext sc = SSLContext.getInstance("SSL");
+            sc.init(null, trustAllCerts, new java.security.SecureRandom());
+            HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+        } catch (Exception e) {
         }
-        ClientConnectionManager cm = new SingleClientConnManager(schemeRegistry);
-        return new DefaultHttpClient(cm);
     }
 
     /**
@@ -153,14 +157,18 @@ public class HIBPApi {
             throw new InvalidAPIRequestException();
         }
 
-        Unirest.setHttpClient(makeClient());
-
         try {
-            GetRequest getRequest = Unirest.get(baseUrl + params).headers(headers);
+            URL url = new URL(baseUrl + params);
+            HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
+            conn.setUseCaches(false);
 
-            HttpResponse<String> response = getRequest.asString();
+            for (Map.Entry<String, String> header : headers.entrySet()) {
+                conn.addRequestProperty(header.getKey(), header.getValue());
+            }
 
-            switch (response.getStatus()) {
+            InputStreamReader reader = new InputStreamReader(conn.getInputStream());
+
+            switch (conn.getResponseCode()) {
                 case 403:
                 case 400: {
                     throw new InvalidAPIRequestException();
@@ -173,7 +181,7 @@ public class HIBPApi {
                     JsonFactory factory = mapper.getFactory();
 
                     try {
-                        JsonParser jsonParser = factory.createParser(response.getBody());
+                        JsonParser jsonParser = factory.createParser(reader);
                         return mapper.readTree(jsonParser);
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -181,8 +189,9 @@ public class HIBPApi {
                     }
                 }
             }
-        } catch (UnirestException e) {
-            throw new ApiUnirestException(e);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new ApiException(e.getLocalizedMessage());
         }
     }
 }
