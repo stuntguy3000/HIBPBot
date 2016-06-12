@@ -166,8 +166,6 @@ public class HIBPApi {
                 conn.addRequestProperty(header.getKey(), header.getValue());
             }
 
-            InputStreamReader reader = new InputStreamReader(conn.getInputStream());
-
             switch (conn.getResponseCode()) {
                 case 403:
                 case 400: {
@@ -177,6 +175,7 @@ public class HIBPApi {
                     throw new NoUserException();
                 }
                 default: {
+                    InputStreamReader reader = new InputStreamReader(conn.getInputStream());
                     ObjectMapper mapper = new ObjectMapper();
                     JsonFactory factory = mapper.getFactory();
 
