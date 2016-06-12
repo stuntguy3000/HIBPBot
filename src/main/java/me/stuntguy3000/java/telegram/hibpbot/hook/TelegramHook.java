@@ -4,7 +4,9 @@ import lombok.Getter;
 import me.stuntguy3000.java.telegram.hibpbot.HIBPBot;
 import me.stuntguy3000.java.telegram.hibpbot.command.BreachCommand;
 import me.stuntguy3000.java.telegram.hibpbot.command.BreachesCommand;
+import me.stuntguy3000.java.telegram.hibpbot.command.HelpCommand;
 import me.stuntguy3000.java.telegram.hibpbot.command.UserBreachCommand;
+import me.stuntguy3000.java.telegram.hibpbot.command.VersionCommand;
 import me.stuntguy3000.java.telegram.hibpbot.handler.CommandHandler;
 import me.stuntguy3000.java.telegram.hibpbot.handler.LogHandler;
 import me.stuntguy3000.java.telegram.hibpbot.handler.TelegramEventHandler;
@@ -36,6 +38,8 @@ public class TelegramHook {
         commandHandler.registerCommand(new BreachesCommand());
         commandHandler.registerCommand(new BreachCommand());
         commandHandler.registerCommand(new UserBreachCommand());
+        commandHandler.registerCommand(new HelpCommand());
+        commandHandler.registerCommand(new VersionCommand());
     }
 }
     
