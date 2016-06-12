@@ -13,7 +13,7 @@ import pro.zackpollard.telegrambot.api.event.chat.message.CommandMessageReceived
 public class HelpCommand extends Command {
 
     public HelpCommand() {
-        super(HIBPBot.getInstance(), "/help View help information", false, "help", "start");
+        super(HIBPBot.getInstance(), "View help information", false, "help", "start");
     }
 
     public void processCommand(CommandMessageReceivedEvent event) {
@@ -24,7 +24,7 @@ public class HelpCommand extends Command {
         stringBuilder.append("*Command List*:\n");
 
         for (Command command : HIBPBot.getInstance().getCommandHandler().getCommands().values()) {
-            stringBuilder.append(String.format("/%s - %s\n", command.getNames()[0], getDescription()));
+            stringBuilder.append(String.format("/%s - %s\n", command.getNames()[0], command.getDescription()));
         }
 
         chat.sendMessage(SendableTextMessage.builder().message(
