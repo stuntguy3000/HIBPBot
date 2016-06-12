@@ -83,7 +83,7 @@ public class HIBPApi {
      */
     public List<Breach> getBreachList(String domain) throws ApiException {
         if (domain == null) {
-            if (hibpCache.getCachedBreaches() != null) {
+            if (hibpCache.getCachedBreaches() != null && !hibpCache.getCachedBreaches().isEmpty()) {
                 return hibpCache.getCachedBreaches();
             }
         } else {

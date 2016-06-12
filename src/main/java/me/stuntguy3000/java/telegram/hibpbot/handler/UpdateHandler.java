@@ -1,10 +1,6 @@
 package me.stuntguy3000.java.telegram.hibpbot.handler;
 
 
-import com.mashape.unirest.http.HttpResponse;
-import com.mashape.unirest.http.Unirest;
-import com.mashape.unirest.http.exceptions.UnirestException;
-
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
@@ -12,6 +8,7 @@ import java.io.IOException;
 import java.net.URL;
 
 import me.stuntguy3000.java.telegram.hibpbot.HIBPBot;
+import me.stuntguy3000.java.telegram.hibpbot.object.Util;
 
 /**
  * Automatically update this bot
@@ -40,18 +37,14 @@ public class UpdateHandler implements Runnable {
         int newBuild;
 
         while (true) {
-            try {
-                HttpResponse<String> response = Unirest.get("http://ci.zackpollard.pro/job/" + projectName + "/lastSuccessfulBuild/buildNumber").asString();
 
-                if (response.getStatus() == 200) {
-                    newBuild = Integer.parseInt(response.getBody());
-                } else {
-                    LogHandler.log("[ERROR] Updater status code: " + response.getStatus());
-                    instance.sendToAdmins("[ERROR] Updater status code: " + response.getStatus() + "\n\nUpdater stopped.");
-                    return;
-                }
-            } catch (UnirestException e) {
-                e.printStackTrace();
+            try {
+                String response = Util.getText("http://ci.zackpollard.pro/job/" + projectName + "/lastSuccessfulBuild/buildNumber");
+
+                newBuild = Integer.parseInt(response);
+            } catch (Exception ex) {
+                LogHandler.log("Exception occurred whilst updating.");
+                ex.printStackTrace();
                 return;
             }
 
