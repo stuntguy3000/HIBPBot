@@ -11,8 +11,7 @@ import java.util.regex.Pattern;
  */
 public class Util {
     private static Pattern URL_REGEX = Pattern.compile("^(?:(?!-)[\\w-]{1,63}(?<!-)\\.)+(?!-)[\\w-]{1,63}(?<!-)$", Pattern.CASE_INSENSITIVE);
-    private static Pattern USER_REGEX = Pattern.compile("^[a-zA-Z0-9]+$|^[a-zA-Z0-9]+@[a-zA-Z0-9]+\\.[a-zA-Z.]+$", Pattern.CASE_INSENSITIVE);
-
+    private static Pattern USER_REGEX = Pattern.compile("^[a-zA-Z0-9.]+$|^[a-zA-Z0-9.]+@([a-zA-Z0-9]+\\.)+[a-zA-Z.]+$", Pattern.CASE_INSENSITIVE);
     /**
      * Returns if the input matches the regex validation
      *
