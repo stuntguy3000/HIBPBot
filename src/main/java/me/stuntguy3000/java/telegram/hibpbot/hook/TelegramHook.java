@@ -25,8 +25,8 @@ public class TelegramHook {
         bot = TelegramBot.login(authKey);
         bot.startUpdates(false);
         bot.getEventsManager().register(new TelegramEventHandler());
-        LogHandler.log("Connected to Telegram.");
 
+        LogHandler.log("Connected to Telegram.");
         instance.sendToAdmins("Bot has connected, running build #" + instance.getCurrentBuild());
 
         registerCommands();

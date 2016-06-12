@@ -34,7 +34,7 @@ public class BreachCommand extends Command {
             if (Util.isValidURL(domain)) {
                 try {
                     List<Breach> breaches = HIBPBot.getInstance().getHibpApi().getBreachList(event.getArgs()[0]);
-                    BreachHandler.sendBreachInformation(event.getChat(), breaches);
+                    BreachHandler.sendBreachInformation(event.getChat(), breaches, message);
                 } catch (NoBreachesException | NoUserException ex) {
                     TelegramHook.getBot().editMessageText(
                             message, "No breaches could be found under this domain.",

@@ -99,37 +99,59 @@ public class BreachHandler {
         paginatedMessage.setMessage(message);
     }
 
-    public static void sendBreachInformation(Chat chat, List<Breach> breaches) {
+    public static void sendBreachInformation(Chat chat, List<Breach> breaches, @Nullable Message existingMessage) {
         if (breaches == null || breaches.isEmpty()) {
-            chat.sendMessage("No site found.");
+            SendableTextMessage message = SendableTextMessage.builder()
+                    .message("*No breaches found.*")
+                    .parseMode(ParseMode.MARKDOWN)
+                    .disableWebPagePreview(true)
+                    .build();
+
+            if (existingMessage == null) {
+                chat.sendMessage(message);
+            } else {
+                TelegramHook.getBot().editMessageText(
+                        existingMessage,
+                        message.getMessage(),
+                        ParseMode.MARKDOWN, true, null
+                );
+            }
             return;
         }
 
         Breach breach = breaches.get(0);
+        String message = String.format(
+                "<b>Breach Information: </b>\n" +
+                        "<b>Domain: </b>%s\n" +
+                        "<b>Name: </b>%s\n" +
+                        "<b>Title: </b>%s\n" +
+                        "<b>Effected users: </b>%s\n" +
+                        "<b>Added on: </b>%s\n" +
+                        "<b>Breached on: </b>%s\n" +
+                        "<b>Leaked Data: </b>%s\n\n" +
+                        "<b>Description: </b>%s",
+                breach.getDomain(),
+                breach.getName(),
+                breach.getTitle(),
+                breach.getPwnCount(),
+                breach.getAddedDate(),
+                breach.getBreachDate(),
+                String.join(", ", breach.getDataClasses()),
+                breach.getDescription());
 
-        chat.sendMessage(
-                SendableTextMessage.builder().message(
-                        String.format(
-                                "<b>Breach Information: </b>\n" +
-                                        "<b>Domain: </b>%s\n" +
-                                        "<b>Name: </b>%s\n" +
-                                        "<b>Title: </b>%s\n" +
-                                        "<b>Effected users: </b>%s\n" +
-                                        "<b>Added on: </b>%s\n" +
-                                        "<b>Breached on: </b>%s\n" +
-                                        "<b>Leaked Data: </b>%s\n\n" +
-                                        "<b>Description: </b>%s",
-                                breach.getDomain(),
-                                breach.getName(),
-                                breach.getTitle(),
-                                breach.getPwnCount(),
-                                breach.getAddedDate(),
-                                breach.getBreachDate(),
-                                String.join(", ", breach.getDataClasses()),
-                                breach.getDescription()))
-                        .parseMode(ParseMode.HTML)
-                        .disableWebPagePreview(true)
-                        .build()
-        );
+        if (existingMessage == null) {
+            chat.sendMessage(
+                    SendableTextMessage.builder().message(message)
+                            .parseMode(ParseMode.HTML)
+                            .disableWebPagePreview(true)
+                            .build()
+            );
+        } else {
+            TelegramHook.getBot().editMessageText(
+                    existingMessage,
+                    message,
+                    ParseMode.HTML, true, null
+            );
+        }
     }
 }

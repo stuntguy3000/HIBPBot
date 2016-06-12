@@ -8,9 +8,11 @@ import me.stuntguy3000.java.telegram.hibpbot.api.exception.NoBreachesException;
 import me.stuntguy3000.java.telegram.hibpbot.api.exception.NoUserException;
 import me.stuntguy3000.java.telegram.hibpbot.api.model.Breach;
 import me.stuntguy3000.java.telegram.hibpbot.handler.BreachHandler;
+import me.stuntguy3000.java.telegram.hibpbot.hook.TelegramHook;
 import me.stuntguy3000.java.telegram.hibpbot.object.Util;
 import me.stuntguy3000.java.telegram.hibpbot.object.command.Command;
 import pro.zackpollard.telegrambot.api.chat.message.Message;
+import pro.zackpollard.telegrambot.api.chat.message.send.ParseMode;
 import pro.zackpollard.telegrambot.api.event.chat.message.CommandMessageReceivedEvent;
 
 /**
@@ -34,14 +36,22 @@ public class UserBreachCommand extends Command {
                     List<Breach> breaches = HIBPBot.getInstance().getHibpApi().getUserBreaches(userID);
                     BreachHandler.sendBreaches(event.getChat(), breaches, userID, message);
                 } catch (NoBreachesException | NoUserException ex) {
-                    event.getChat().sendMessage("This user was not found in any breaches.");
+                    TelegramHook.getBot().editMessageText(
+                            message, "No breaches could be found for this user.",
+                            ParseMode.MARKDOWN, true, null
+                    );
                 }
             } else {
-                event.getChat().sendMessage("The username is invalid.\n" +
-                        "If this is a mistake, contact @stuntguy3000");
+                TelegramHook.getBot().editMessageText(
+                        message, "The username or email address is invalid.\n\nPlease contact @stuntguy3000 if this is a mistake.",
+                        ParseMode.MARKDOWN, true, null
+                );
             }
         } else {
-            event.getChat().sendMessage("Please specify an email address.");
+            TelegramHook.getBot().editMessageText(
+                    message, "Please specify a username or email address.",
+                    ParseMode.MARKDOWN, true, null
+            );
         }
     }
 }
