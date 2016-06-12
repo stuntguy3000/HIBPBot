@@ -1,10 +1,13 @@
 package me.stuntguy3000.java.telegram.hibpbot.handler;
 
+import org.jetbrains.annotations.Nullable;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import me.stuntguy3000.java.telegram.hibpbot.HIBPBot;
 import me.stuntguy3000.java.telegram.hibpbot.api.model.Breach;
+import me.stuntguy3000.java.telegram.hibpbot.hook.TelegramHook;
 import me.stuntguy3000.java.telegram.hibpbot.object.PaginatedMessage;
 import pro.zackpollard.telegrambot.api.chat.Chat;
 import pro.zackpollard.telegrambot.api.chat.message.Message;
@@ -17,11 +20,25 @@ import pro.zackpollard.telegrambot.api.chat.message.send.SendableTextMessage;
 public class BreachHandler {
 
 
-    public static void sendBreaches(Chat chat, List<Breach> breaches, String userID) {
+    public static void sendBreaches(Chat chat, List<Breach> breaches, @Nullable String userID, @Nullable Message existingMessage) {
         List<String> content = new ArrayList<>();
 
         if (breaches == null || breaches.size() == 0) {
-            chat.sendMessage("No sites found for user " + userID + ".");
+            SendableTextMessage message = SendableTextMessage.builder()
+                    .message("*No breaches found.*")
+                    .parseMode(ParseMode.MARKDOWN)
+                    .disableWebPagePreview(true)
+                    .build();
+
+            if (existingMessage == null) {
+                chat.sendMessage(message);
+            } else {
+                TelegramHook.getBot().editMessageText(
+                        existingMessage,
+                        message.getMessage(),
+                        ParseMode.MARKDOWN, true, null
+                );
+            }
             return;
         }
 
@@ -39,20 +56,45 @@ public class BreachHandler {
         }
 
         if (content.size() == 1) {
-            chat.sendMessage("No sites found for user " + userID + ".");
+            SendableTextMessage message = SendableTextMessage.builder()
+                    .message("No sites found for user " + userID + ".")
+                    .parseMode(ParseMode.MARKDOWN)
+                    .disableWebPagePreview(true)
+                    .build();
+
+            if (existingMessage == null) {
+                chat.sendMessage(message);
+            } else {
+                TelegramHook.getBot().editMessageText(
+                        existingMessage,
+                        message.getMessage(),
+                        ParseMode.MARKDOWN, true, null
+                );
+            }
             return;
         }
 
         PaginatedMessage paginatedMessage =
                 HIBPBot.getInstance().getPaginationHandler().createPaginatedMessage(content, 15);
+        Message message;
 
-        Message message = chat.sendMessage(
-                SendableTextMessage.builder()
-                        .message(paginatedMessage.getPaginatedList().getCurrentPageContent())
-                        .replyMarkup(paginatedMessage.getButtons())
-                        .parseMode(ParseMode.MARKDOWN)
-                        .disableWebPagePreview(true)
-                        .build());
+        if (existingMessage == null) {
+            message = chat.sendMessage(
+                    SendableTextMessage.builder()
+                            .message(paginatedMessage.getPaginatedList().getCurrentPageContent())
+                            .replyMarkup(paginatedMessage.getButtons())
+                            .parseMode(ParseMode.MARKDOWN)
+                            .disableWebPagePreview(true)
+                            .build());
+        } else {
+            message = TelegramHook.getBot().editMessageText(
+                    existingMessage,
+                    paginatedMessage.getPaginatedList().getCurrentPageContent(),
+                    ParseMode.MARKDOWN,
+                    true,
+                    paginatedMessage.getButtons()
+            );
+        }
 
         paginatedMessage.setMessage(message);
     }

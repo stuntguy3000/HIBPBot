@@ -10,6 +10,7 @@ import me.stuntguy3000.java.telegram.hibpbot.api.model.Breach;
 import me.stuntguy3000.java.telegram.hibpbot.handler.BreachHandler;
 import me.stuntguy3000.java.telegram.hibpbot.object.Util;
 import me.stuntguy3000.java.telegram.hibpbot.object.command.Command;
+import pro.zackpollard.telegrambot.api.chat.message.Message;
 import pro.zackpollard.telegrambot.api.event.chat.message.CommandMessageReceivedEvent;
 
 /**
@@ -23,7 +24,7 @@ public class UserBreachCommand extends Command {
 
     @Override
     public void processCommand(CommandMessageReceivedEvent event) throws ApiException {
-        event.getChat().sendMessage("Fetching...");
+        Message message = event.getChat().sendMessage("One moment please...");
 
         if (event.getArgs().length > 0) {
             String userID = event.getArgs()[0];
@@ -31,7 +32,7 @@ public class UserBreachCommand extends Command {
             if (Util.isValidUsername(userID)) {
                 try {
                     List<Breach> breaches = HIBPBot.getInstance().getHibpApi().getUserBreaches(userID);
-                    BreachHandler.sendBreaches(event.getChat(), breaches, userID);
+                    BreachHandler.sendBreaches(event.getChat(), breaches, userID, message);
                 } catch (NoBreachesException | NoUserException ex) {
                     event.getChat().sendMessage("This user was not found in any breaches.");
                 }
