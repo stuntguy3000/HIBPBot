@@ -20,11 +20,11 @@ public class HelpCommand extends Command {
         Chat chat = event.getChat();
 
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("*HIBPBot* is a Telegram implementation of http://www.haveibeenpwned.com which is a free service allowing anyone to see if an email or username has been leaked in recent significant database breaches.\n\n");
+        stringBuilder.append("*HIBPBot* is a Telegram implementation of http://www.haveibeenpwned.com which is a free service allowing anyone to see if an email or username has been leaked in recent significant database breaches. This bot has been created by @stuntguy3000.\n\n");
         stringBuilder.append("*Command List*:\n");
 
         for (Command command : HIBPBot.getInstance().getCommandHandler().getCommands().values()) {
-            stringBuilder.append(String.format("/%s - %s", command.getNames()[0], getDescription()));
+            stringBuilder.append(String.format("/%s - %s\n", command.getNames()[0], getDescription()));
         }
 
         chat.sendMessage(SendableTextMessage.builder().message(
