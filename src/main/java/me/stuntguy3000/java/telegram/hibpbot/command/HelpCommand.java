@@ -13,7 +13,7 @@ import pro.zackpollard.telegrambot.api.event.chat.message.CommandMessageReceived
 public class HelpCommand extends Command {
 
     public HelpCommand() {
-        super(HIBPBot.getInstance(), "/help View help information", false, "start");
+        super(HIBPBot.getInstance(), "/help View help information", false, "help", "start");
     }
 
     public void processCommand(CommandMessageReceivedEvent event) {
