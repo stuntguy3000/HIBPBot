@@ -102,5 +102,5 @@ crashlytics.properties
 crashlytics-build.properties
 fabric.properties
 src/main/resources/
-config.json
+*.json
 run.bat
