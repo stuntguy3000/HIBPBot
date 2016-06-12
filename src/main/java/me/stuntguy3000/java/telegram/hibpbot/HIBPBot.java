@@ -50,9 +50,9 @@ public class HIBPBot {
 
     public void main() {
         instance = this;
+        paginationHandler = new PaginationHandler();
         configHandler = new ConfigHandler();
         commandHandler = new CommandHandler();
-        paginationHandler = new PaginationHandler();
 
         hibpApi = new HIBPApi();
 

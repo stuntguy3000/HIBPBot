@@ -35,7 +35,7 @@ import me.stuntguy3000.java.telegram.hibpbot.object.Util;
 public class HIBPApi {
 
     private final HIBPCache hibpCache;
-    private final String baseUrl = "https://haveibeenpwned.com/api/";
+    private final String baseUrl = "https://haveibeenpwned.com/api/v2/";
     private final int apiVersion = 2;
     private final HashMap<String, String> headers;
     private final Gson gson = new GsonBuilder().create();
