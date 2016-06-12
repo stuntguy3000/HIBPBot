@@ -52,7 +52,7 @@ public class BreachHandler {
             if (breach.getDomain() == null) {
                 continue;
             }
-            content.add(String.format("*%s*: `%s` - %d affected users", breach.getTitle(), breach.getDomain(), breach.getPwnCount()));
+            content.add(String.format("*%s*: `%s` - %d affected users", breach.getName(), breach.getDomain(), breach.getPwnCount()));
         }
 
         if (content.size() == 1) {
