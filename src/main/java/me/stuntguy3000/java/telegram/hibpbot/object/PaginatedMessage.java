@@ -1,7 +1,6 @@
 package me.stuntguy3000.java.telegram.hibpbot.object;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.LinkedList;
 import java.util.UUID;
 
 import lombok.Data;
@@ -28,7 +27,7 @@ public class PaginatedMessage {
             return null;
         }
 
-        List<InlineKeyboardButton> buttons = new ArrayList<>();
+        LinkedList<InlineKeyboardButton> buttons = new LinkedList<>();
 
         if (paginatedList.getCurrentPage() > 1) {
             buttons.add(InlineKeyboardButton.builder()
