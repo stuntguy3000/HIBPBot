@@ -174,7 +174,7 @@ public class HIBPApi {
                 case 404: {
                     throw new NoUserException();
                 }
-                default: {
+                case 200: {
                     InputStreamReader reader = new InputStreamReader(conn.getInputStream());
                     ObjectMapper mapper = new ObjectMapper();
                     JsonFactory factory = mapper.getFactory();
@@ -186,6 +186,9 @@ public class HIBPApi {
                         e.printStackTrace();
                         throw new InvalidAPIRequestException();
                     }
+                }
+                default: {
+                    throw new ApiException("API returned HTTP code " + conn.getResponseMessage());
                 }
             }
         } catch (Exception e) {
