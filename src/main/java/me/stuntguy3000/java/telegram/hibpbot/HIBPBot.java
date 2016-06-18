@@ -9,6 +9,8 @@ import me.stuntguy3000.java.telegram.hibpbot.handler.JenkinsUpdateHandler;
 import me.stuntguy3000.java.telegram.hibpbot.handler.LogHandler;
 import me.stuntguy3000.java.telegram.hibpbot.handler.PaginationHandler;
 import me.stuntguy3000.java.telegram.hibpbot.hook.TelegramHook;
+import pro.zackpollard.telegrambot.api.chat.message.send.ParseMode;
+import pro.zackpollard.telegrambot.api.chat.message.send.SendableTextMessage;
 
 // @author Luke Anderson | stuntguy3000
 @Data
@@ -94,7 +96,8 @@ public class HIBPBot {
      */
     public void sendToAdmins(String message) {
         for (int adminID : configHandler.getBotSettings().getTelegramAdmins()) {
-            TelegramHook.getBot().getChat(adminID).sendMessage(message);
+            TelegramHook.getBot().getChat(adminID).sendMessage(
+                    SendableTextMessage.builder().message(message).parseMode(ParseMode.MARKDOWN).build());
         }
     }
 }
