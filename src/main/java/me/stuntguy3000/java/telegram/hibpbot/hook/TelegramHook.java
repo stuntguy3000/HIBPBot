@@ -32,9 +32,9 @@ public class TelegramHook {
         JenkinsUpdateHandler.UpdateInformation updateInformation = instance.getJenkinsUpdateHandler().getLastUpdate();
 
         if (updateInformation == null || updateInformation.getGitCommitAuthors() == null || updateInformation.getGitCommitAuthors().isEmpty()) {
-            instance.sendToAdmins("*RedditLiveBot has connected.\n\n No build information available...*");
+            instance.sendToAdmins("*HIBPBot has connected.\n\n No build information available...*");
         } else {
-            instance.sendToAdmins(String.format("*RedditLiveBot has connected (Build %d).*\n\n" +
+            instance.sendToAdmins(String.format("*HIBPBot has connected (Build %d).*\n\n" +
                             "*Last commit information:*\n" +
                             "*Description:* %s\n" +
                             "*Author:* %s\n" +
