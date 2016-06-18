@@ -38,7 +38,6 @@ import me.stuntguy3000.java.telegram.hibpbot.api.model.Breach;
 import me.stuntguy3000.java.telegram.hibpbot.hook.TelegramHook;
 import me.stuntguy3000.java.telegram.hibpbot.object.PaginatedMessage;
 import me.stuntguy3000.java.telegram.hibpbot.object.Util;
-import pro.zackpollard.telegrambot.api.chat.inline.ChosenInlineResult;
 import pro.zackpollard.telegrambot.api.chat.inline.send.InlineQueryResponse;
 import pro.zackpollard.telegrambot.api.chat.inline.send.content.InputTextMessageContent;
 import pro.zackpollard.telegrambot.api.chat.inline.send.results.InlineQueryResult;
@@ -47,7 +46,6 @@ import pro.zackpollard.telegrambot.api.chat.message.send.ParseMode;
 import pro.zackpollard.telegrambot.api.event.Listener;
 import pro.zackpollard.telegrambot.api.event.chat.CallbackQueryReceivedEvent;
 import pro.zackpollard.telegrambot.api.event.chat.inline.InlineQueryReceivedEvent;
-import pro.zackpollard.telegrambot.api.event.chat.inline.InlineResultChosenEvent;
 import pro.zackpollard.telegrambot.api.event.chat.message.CommandMessageReceivedEvent;
 
 /**
@@ -128,34 +126,6 @@ public class TelegramEventHandler implements Listener {
     }
 
     @Override
-    public void onInlineResultChosen(InlineResultChosenEvent event) {
-        ChosenInlineResult chosenInlineResult = event.getChosenResult();
-        String id = chosenInlineResult.getInlineMessageId();
-
-        if (id.contains("|")) {
-            String userID = id.split("\\|")[0];
-            List<Breach> breaches = null;
-            try {
-                breaches = HIBPBot.getInstance().getHibpApi().getUserBreaches(userID);
-
-                if (!(breaches == null || breaches.isEmpty() || breaches.size() == 0)) {
-                    //
-                }
-            } catch (ApiException e) {
-                e.printStackTrace();
-            }
-        }
-
-        TelegramHook.getBot().editInlineMessageReplyMarkup(
-                id, InlineQueryResultArticle.builder()
-                        .inputMessageContent(
-                                InputTextMessageContent.builder().messageText("Wot kk").build()
-                        )
-                        .build().getReplyMarkup()
-        );
-    }
-
-    @Override
     public void onInlineQueryReceived(InlineQueryReceivedEvent event) {
         String input = event.getQuery().getQuery();
         List<InlineQueryResult> inlineQueryResults = new ArrayList<>();
@@ -172,7 +142,10 @@ public class TelegramEventHandler implements Listener {
                     .title(breaches.size() + " breach" + Util.plural("es", breaches.size()) + " found.")
                     .thumbUrl(IMAGE_RED_URL)
                     .inputMessageContent(
-                            InputTextMessageContent.builder().messageText("Loading...").build()
+                            InputTextMessageContent.builder().messageText(
+                                    "(Click here to learn more...)[https://telegram.me/hibpbot?start=" +
+                                            HIBPBot.getInstance().getDeepLinkHandler().addLink(event.getQuery().getSender(), input)
+                                            + "]").build()
                     )
                     .id(input + "|" + UUID.randomUUID())
                     .build()

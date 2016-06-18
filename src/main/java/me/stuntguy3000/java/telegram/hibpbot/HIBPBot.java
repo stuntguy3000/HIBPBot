@@ -1,18 +1,13 @@
 package me.stuntguy3000.java.telegram.hibpbot;
 
-import org.apache.commons.io.FileUtils;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintWriter;
-
 import lombok.Data;
 import me.stuntguy3000.java.telegram.hibpbot.api.HIBPApi;
 import me.stuntguy3000.java.telegram.hibpbot.handler.CommandHandler;
 import me.stuntguy3000.java.telegram.hibpbot.handler.ConfigHandler;
+import me.stuntguy3000.java.telegram.hibpbot.handler.DeepLinkHandler;
+import me.stuntguy3000.java.telegram.hibpbot.handler.JenkinsUpdateHandler;
 import me.stuntguy3000.java.telegram.hibpbot.handler.LogHandler;
 import me.stuntguy3000.java.telegram.hibpbot.handler.PaginationHandler;
-import me.stuntguy3000.java.telegram.hibpbot.handler.UpdateHandler;
 import me.stuntguy3000.java.telegram.hibpbot.hook.TelegramHook;
 
 // @author Luke Anderson | stuntguy3000
@@ -25,7 +20,6 @@ public class HIBPBot {
     /*
         Runtime Build Options, set by configuration
      */
-    private int currentBuild = 0;
     private boolean developmentMode = false;
     /*
         Handlers
@@ -33,6 +27,8 @@ public class HIBPBot {
     private ConfigHandler configHandler;
     private CommandHandler commandHandler;
     private PaginationHandler paginationHandler;
+    private DeepLinkHandler deepLinkHandler;
+    private JenkinsUpdateHandler jenkinsUpdateHandler;
     private HIBPApi hibpApi;
 
     public static HIBPBot getInstance() {
@@ -53,41 +49,31 @@ public class HIBPBot {
         paginationHandler = new PaginationHandler();
         configHandler = new ConfigHandler();
         commandHandler = new CommandHandler();
+        deepLinkHandler = new DeepLinkHandler();
 
         hibpApi = new HIBPApi();
 
-        File build = new File("build");
-
-        if (!build.exists()) {
-            try {
-                build.createNewFile();
-                PrintWriter writer = new PrintWriter(build, "UTF-8");
-                writer.print(0);
-                writer.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
-        try {
-            currentBuild = Integer.parseInt(FileUtils.readFileToString(build));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
         LogHandler.log("======================================");
-        LogHandler.log(" HIBPBot build " + currentBuild + " by @stuntguy3000");
+        LogHandler.log(" HIBPBot build by @stuntguy3000");
         LogHandler.log("======================================");
-
-        connectTelegram();
 
         if (this.getConfigHandler().getBotSettings().getAutoUpdater()) {
             LogHandler.log("Starting auto updater...");
-            Thread updater = new Thread(new UpdateHandler(this, "HIBPBot", "HIBPBot"));
-            updater.start();
+            jenkinsUpdateHandler = new JenkinsUpdateHandler(
+                    "HIBPBot", "http://ci.zackpollard.pro/job/",
+                    "HIBPBot.jar", 200
+            );
+
+            try {
+                jenkinsUpdateHandler.startUpdater();
+            } catch (JenkinsUpdateHandler.JenkinsUpdateException e) {
+                e.printStackTrace();
+            }
         } else {
             LogHandler.log("** Auto Updater is set to false **");
         }
+
+        connectTelegram();
 
         while (true) {
             String in = System.console().readLine();

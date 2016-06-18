@@ -8,6 +8,7 @@ import me.stuntguy3000.java.telegram.hibpbot.command.HelpCommand;
 import me.stuntguy3000.java.telegram.hibpbot.command.UserBreachCommand;
 import me.stuntguy3000.java.telegram.hibpbot.command.VersionCommand;
 import me.stuntguy3000.java.telegram.hibpbot.handler.CommandHandler;
+import me.stuntguy3000.java.telegram.hibpbot.handler.JenkinsUpdateHandler;
 import me.stuntguy3000.java.telegram.hibpbot.handler.LogHandler;
 import me.stuntguy3000.java.telegram.hibpbot.handler.TelegramEventHandler;
 import pro.zackpollard.telegrambot.api.TelegramBot;
@@ -27,7 +28,24 @@ public class TelegramHook {
         bot.getEventsManager().register(new TelegramEventHandler());
 
         LogHandler.log("Connected to Telegram.");
-        instance.sendToAdmins("Bot has connected, running build #" + instance.getCurrentBuild());
+
+        JenkinsUpdateHandler.UpdateInformation updateInformation = instance.getJenkinsUpdateHandler().getLastUpdate();
+
+        if (updateInformation == null || updateInformation.getGitCommitAuthors() == null || updateInformation.getGitCommitAuthors().isEmpty()) {
+            instance.sendToAdmins("*RedditLiveBot has connected.\n\n No build information available...*");
+        } else {
+            instance.sendToAdmins(String.format("*RedditLiveBot has connected (Build %d).*\n\n" +
+                            "*Last commit information:*\n" +
+                            "*Description:* %s\n" +
+                            "*Author:* %s\n" +
+                            "*Commit ID:* %s\n",
+                    updateInformation.getBuildNumber(),
+                    updateInformation.getGitCommitMessages().get(0),
+                    updateInformation.getGitCommitAuthors().get(0),
+                    "[" + updateInformation.getGitCommitIds().get(0) + "]" +
+                            "(https://github.com/stuntguy3000/RedditLive/commit/"
+                            + updateInformation.getGitCommitIds().get(0) + ")"));
+        }
 
         registerCommands();
     }
