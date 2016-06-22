@@ -63,7 +63,7 @@ public class HIBPBot {
             LogHandler.log("Starting auto updater...");
             jenkinsUpdateHandler = new JenkinsUpdateHandler(
                     "HIBPBot", "http://ci.zackpollard.pro/job/",
-                    "HIBPBot.jar", 200
+                    "HIBPBot.jar", 60000
             );
 
             try {
