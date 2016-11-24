@@ -2,12 +2,7 @@ package me.stuntguy3000.java.telegram.hibpbot;
 
 import lombok.Data;
 import me.stuntguy3000.java.telegram.hibpbot.api.HIBPApi;
-import me.stuntguy3000.java.telegram.hibpbot.handler.CommandHandler;
-import me.stuntguy3000.java.telegram.hibpbot.handler.ConfigHandler;
-import me.stuntguy3000.java.telegram.hibpbot.handler.DeepLinkHandler;
-import me.stuntguy3000.java.telegram.hibpbot.handler.JenkinsUpdateHandler;
-import me.stuntguy3000.java.telegram.hibpbot.handler.LogHandler;
-import me.stuntguy3000.java.telegram.hibpbot.handler.PaginationHandler;
+import me.stuntguy3000.java.telegram.hibpbot.handler.*;
 import me.stuntguy3000.java.telegram.hibpbot.hook.TelegramHook;
 import pro.zackpollard.telegrambot.api.chat.message.send.ParseMode;
 import pro.zackpollard.telegrambot.api.chat.message.send.SendableTextMessage;
@@ -62,7 +57,7 @@ public class HIBPBot {
         if (this.getConfigHandler().getBotSettings().getAutoUpdater()) {
             LogHandler.log("Starting auto updater...");
             jenkinsUpdateHandler = new JenkinsUpdateHandler(
-                    "HIBPBot", "http://ci.zackpollard.pro/job/",
+                    "HIBPBot", "http://localhost:8080/job/Telegram%20Bots/job/",
                     "HIBPBot.jar", 60000
             );
 
