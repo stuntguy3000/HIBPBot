@@ -1,18 +1,17 @@
 package me.stuntguy3000.java.telegram.hibpbot.handler;
 
-import org.jetbrains.annotations.Nullable;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import me.stuntguy3000.java.telegram.hibpbot.HIBPBot;
 import me.stuntguy3000.java.telegram.hibpbot.api.model.Breach;
 import me.stuntguy3000.java.telegram.hibpbot.hook.TelegramHook;
 import me.stuntguy3000.java.telegram.hibpbot.object.PaginatedMessage;
+import org.jetbrains.annotations.Nullable;
 import pro.zackpollard.telegrambot.api.chat.Chat;
 import pro.zackpollard.telegrambot.api.chat.message.Message;
 import pro.zackpollard.telegrambot.api.chat.message.send.ParseMode;
 import pro.zackpollard.telegrambot.api.chat.message.send.SendableTextMessage;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author stuntguy3000
@@ -102,8 +101,8 @@ public class BreachHandler {
     public static void sendBreachInformation(Chat chat, List<Breach> breaches, @Nullable Message existingMessage) {
         if (breaches == null || breaches.isEmpty()) {
             SendableTextMessage message = SendableTextMessage.builder()
-                    .message("*No breaches found.*")
-                    .parseMode(ParseMode.MARKDOWN)
+                    .message("<b>No breaches found</b>")
+                    .parseMode(ParseMode.HTML)
                     .disableWebPagePreview(true)
                     .build();
 
@@ -113,7 +112,7 @@ public class BreachHandler {
                 TelegramHook.getBot().editMessageText(
                         existingMessage,
                         message.getMessage(),
-                        ParseMode.MARKDOWN, true, null
+                        ParseMode.HTML, true, null
                 );
             }
             return;
