@@ -37,13 +37,13 @@ public class BreachesCommand extends Command {
                     BreachHandler.sendBreaches(event.getChat(), breaches, null, null);
                 } catch (NoBreachesException | NoUserException ex) {
                     TelegramHook.getBot().editMessageText(
-                            message, "No breaches could be found under this domain.",
+                            message, "*No breaches could be found under this domain.*",
                             ParseMode.MARKDOWN, true, null
                     );
                 }
             } else {
                 TelegramHook.getBot().editMessageText(
-                        message, "*The specified domain name is invalid.\n\nIf this is an error, please contact @stuntguy3000.",
+                        message, "*The specified domain name is invalid.*\n\nIf this is an error, please contact @stuntguy3000.",
                         ParseMode.MARKDOWN, true, null
                 );
             }
