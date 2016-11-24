@@ -150,7 +150,7 @@ public class TelegramEventHandler implements Listener {
                     .inputMessageContent(
                             InputTextMessageContent.builder().messageText(
                                     stringBuilder.toString()
-                            ).parseMode(ParseMode.MARKDOWN).disableWebPagePreview(true).build()
+                            ).parseMode(ParseMode.HTML).disableWebPagePreview(true).build()
                     )
                     .id(input + "|" + UUID.randomUUID())
                     .build()
@@ -196,7 +196,7 @@ public class TelegramEventHandler implements Listener {
         }
 
         InlineQueryResponse inlineQueryResponse = InlineQueryResponse.builder()
-                .cacheTime(0).isPersonal(true).results(inlineQueryResults).build();
+                .cacheTime(600).isPersonal(true).results(inlineQueryResults).build();
         event.getQuery().answer(TelegramHook.getBot(), inlineQueryResponse);
     }
 }
