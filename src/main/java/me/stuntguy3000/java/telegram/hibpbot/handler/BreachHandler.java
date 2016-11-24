@@ -102,7 +102,7 @@ public class BreachHandler {
         if (breaches == null || breaches.isEmpty()) {
             SendableTextMessage message = SendableTextMessage.builder()
                     .message("<b>No breaches found</b>")
-                    .parseMode(ParseMode.HTML)
+                    .parseMode(ParseMode.NONE)
                     .disableWebPagePreview(true)
                     .build();
 
@@ -112,7 +112,7 @@ public class BreachHandler {
                 TelegramHook.getBot().editMessageText(
                         existingMessage,
                         message.getMessage(),
-                        ParseMode.HTML, true, null
+                        ParseMode.NONE, true, null
                 );
             }
             return;
@@ -141,7 +141,7 @@ public class BreachHandler {
         if (existingMessage == null) {
             chat.sendMessage(
                     SendableTextMessage.builder().message(message)
-                            .parseMode(ParseMode.HTML)
+                            .parseMode(ParseMode.NONE)
                             .disableWebPagePreview(true)
                             .build()
             );
@@ -149,7 +149,7 @@ public class BreachHandler {
             TelegramHook.getBot().editMessageText(
                     existingMessage,
                     message,
-                    ParseMode.HTML, true, null
+                    ParseMode.NONE, true, null
             );
         }
     }

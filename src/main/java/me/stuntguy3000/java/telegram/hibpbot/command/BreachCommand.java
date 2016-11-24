@@ -38,19 +38,19 @@ public class BreachCommand extends Command {
                 } catch (NoBreachesException | NoUserException ex) {
                     TelegramHook.getBot().editMessageText(
                             message, "*No breaches could be found under this domain.*",
-                            ParseMode.HTML, true, null
+                            ParseMode.NONE, true, null
                     );
                 }
             } else {
                 TelegramHook.getBot().editMessageText(
                         message, "*The specified domain name is invalid.*\n\nIf this is an error, please contact @stuntguy3000.",
-                        ParseMode.HTML, true, null
+                        ParseMode.NONE, true, null
                 );
             }
         } else {
             TelegramHook.getBot().editMessageText(
                     message, "*Please specify a domain!*",
-                    ParseMode.HTML, true, null
+                    ParseMode.NONE, true, null
             );
         }
     }
