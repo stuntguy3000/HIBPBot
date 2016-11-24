@@ -1,8 +1,6 @@
 package me.stuntguy3000.java.telegram.hibpbot.command;
 
 
-import java.util.List;
-
 import me.stuntguy3000.java.telegram.hibpbot.HIBPBot;
 import me.stuntguy3000.java.telegram.hibpbot.api.exception.ApiException;
 import me.stuntguy3000.java.telegram.hibpbot.api.exception.NoBreachesException;
@@ -16,6 +14,8 @@ import pro.zackpollard.telegrambot.api.chat.message.Message;
 import pro.zackpollard.telegrambot.api.chat.message.send.ParseMode;
 import pro.zackpollard.telegrambot.api.event.chat.message.CommandMessageReceivedEvent;
 
+import java.util.List;
+
 /**
  * @author stuntguy3000
  */
@@ -26,7 +26,7 @@ public class BreachesCommand extends Command {
 
     @Override
     public void processCommand(CommandMessageReceivedEvent event) throws ApiException {
-        Message message = event.getChat().sendMessage("One moment please...");
+        Message message = event.getChat().sendMessage("Loading Data....");
 
         if (event.getArgs().length > 0) {
             String domain = event.getArgs()[0];
