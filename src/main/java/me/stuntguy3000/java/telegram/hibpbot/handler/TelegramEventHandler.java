@@ -137,15 +137,20 @@ public class TelegramEventHandler implements Listener {
 
             List<Breach> breaches = HIBPBot.getInstance().getHibpApi().getUserBreaches(input);
 
+            StringBuilder stringBuilder = new StringBuilder("<b>Breached Services: </b>");
+
+            for (Breach breach : breaches) {
+                stringBuilder.append("\n").append("<b>").append(breach.getName()).append("</b> (").append(breach.getDomain()).append(")");
+            }
+
             inlineQueryResults.add(InlineQueryResultArticle.builder()
                     .description(input + " was found in " + breaches.size() + " breach" + Util.plural("es", breaches.size()) + ". Click here to learn more.")
                     .title(breaches.size() + " breach" + Util.plural("es", breaches.size()) + " found.")
                     .thumbUrl(IMAGE_RED_URL)
                     .inputMessageContent(
                             InputTextMessageContent.builder().messageText(
-                                    "(Click here to learn more...)[https://telegram.me/hibpbot?start=" +
-                                            HIBPBot.getInstance().getDeepLinkHandler().addLink(event.getQuery().getSender(), input)
-                                            + "]").build()
+                                    stringBuilder.toString()
+                            ).parseMode(ParseMode.MARKDOWN).disableWebPagePreview(true).build()
                     )
                     .id(input + "|" + UUID.randomUUID())
                     .build()
