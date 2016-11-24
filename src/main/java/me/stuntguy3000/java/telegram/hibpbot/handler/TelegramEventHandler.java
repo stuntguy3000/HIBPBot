@@ -24,12 +24,6 @@
 
 package me.stuntguy3000.java.telegram.hibpbot.handler;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-
 import me.stuntguy3000.java.telegram.hibpbot.HIBPBot;
 import me.stuntguy3000.java.telegram.hibpbot.api.exception.ApiException;
 import me.stuntguy3000.java.telegram.hibpbot.api.exception.InvalidAPIRequestException;
@@ -47,6 +41,12 @@ import pro.zackpollard.telegrambot.api.event.Listener;
 import pro.zackpollard.telegrambot.api.event.chat.CallbackQueryReceivedEvent;
 import pro.zackpollard.telegrambot.api.event.chat.inline.InlineQueryReceivedEvent;
 import pro.zackpollard.telegrambot.api.event.chat.message.CommandMessageReceivedEvent;
+
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 /**
  * Handles various Telegram events
@@ -190,7 +190,8 @@ public class TelegramEventHandler implements Listener {
             );
         }
 
-        InlineQueryResponse inlineQueryResponse = InlineQueryResponse.builder().cache_time(0).is_personal(true).results(inlineQueryResults).build();
+        InlineQueryResponse inlineQueryResponse = InlineQueryResponse.builder()
+                .cacheTime(0).isPersonal(true).results(inlineQueryResults).build();
         event.getQuery().answer(TelegramHook.getBot(), inlineQueryResponse);
     }
 }
